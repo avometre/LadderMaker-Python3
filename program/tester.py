@@ -14,10 +14,10 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 """
 
 #this wil be the outline to C functions
-from PyQt4 import QtCore, QtGui
-from PyQt4.Qt import QFont
-from PyQt4.QtGui import QApplication, QCursor
-from PyQt4.QtCore import Qt
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QCursor, QFont # QFont will be used from QtGui
+from PyQt5.QtCore import Qt
 
 import subprocess, datetime, os, time, signal
 
@@ -35,13 +35,13 @@ class tester():
         self.currentHW = currentHW
     
     def test1(self,displayOutputPlace):
-        QApplication.setOverrideCursor(QCursor(Qt.WaitCursor))
+        QApplication.setOverrideCursor(QCursor(QtCore.Qt.WaitCursor))
         displayOutputPlace.setText("")
         self.boldLine(displayOutputPlace,"Test for "+self.currentHW+" Hardware on USB")
-        print "current dir:", os.getcwd()
+        print(("current dir:", os.getcwd()))
         os.chdir("../helpers/hexes")
-        print "current dir:", os.getcwd()
-        print "looking for programming hardware on usb"
+        print(("current dir:", os.getcwd()))
+        print("looking for programming hardware on usb")
         dudeCommand  = None
         QApplication.processEvents()#this makes the UI update before going on.
         if self.opSys == "NIX" and self.currentHW == "Waltech": dudeCommand = self.testWaltechNIX(displayOutputPlace)
@@ -60,10 +60,10 @@ class tester():
         time.sleep(1)
         QApplication.restoreOverrideCursor()
         os.chdir("../")
-        print "current dir:", os.getcwd()
+        print(("current dir:", os.getcwd()))
         os.chdir("./program")
-        print "current dir:", os.getcwd()
-        if "program" not in os.getcwd(): print "worng place"
+        print(("current dir:", os.getcwd()))
+        if "program" not in os.getcwd(): print("worng place")
         return dudeCommand 
   
   
@@ -208,12 +208,12 @@ class tester():
     def testArduinoMegaWIN(self,displayOutputPlace):
         self.boldLine(displayOutputPlace,"Checking ports 1-9 for Arduino.")
         QApplication.processEvents()#this makes the UI update before going on.
-        print "scanning com 1 to com 9..."
+        print("scanning com 1 to com 9...")
         USBserialPort = None
         for i in range(9):
             
             maybePort = "com"+str(i)
-            print "maybe port : ",maybePort
+            print(("maybe port : ",maybePort))
             commandAvrDude = r"..\\WinAVR\\bin\\avrdude.exe -p m2560 -P " + maybePort + " -c wiring"
             commandwfile = commandAvrDude #why?  
             start = datetime.datetime.now()
@@ -230,11 +230,11 @@ class tester():
                     subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
                     #os.kill(process.pid, signal.SIGKILL) #use SIGKILL for not windows
                     #os.waitpid(-1, os.WNOHANG)              #use WHOHANG for not windows
-                    print "timed out"
+                    print("timed out")
                     output = process.stdout.read()
                     error = process.stderr.read()
-                    print "error:", error
-                    print "output", output
+                    print(("error:", error))
+                    print(("output", output))
                     if "timeout" in error:
                         self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
                         USBserialPort = "timeout"
@@ -242,7 +242,7 @@ class tester():
             error = process.stderr.read()
             if "avrdude.exe: AVR device initialized and ready to accept instructions" in error:
                 USBserialPort = maybePort
-                print" this is the port:",  USBserialPort
+                print((" this is the port:",  USBserialPort))
                 self.boldLine(displayOutputPlace, "Arduino found on "+str(USBserialPort))
         if USBserialPort == None: 
             self.boldLine(displayOutputPlace,"Arduino not found")
@@ -271,7 +271,7 @@ class tester():
             #m.start()  # equals the starting index of the last match
             #m.end()    # equals the ending index of the last match 
             rest = output[m.end():-1]
-            print "the rest:" ,rest
+            print(("the rest:" ,rest))
             match_found=False
             matches = re.finditer("tty", rest)
             for m in matches: match_found=True
@@ -302,22 +302,22 @@ class tester():
                         subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
                         os.kill(process.pid, signal.SIGKILL)
                         os.waitpid(-1, os.WNOHANG)
-                        print "timed out"
+                        print("timed out")
                         output = process.stdout.read()
                         error = process.stderr.read()
-                        print "error:", error
-                        print "output", output
+                        print(("error:", error))
+                        print(("output", output))
                         if "timeout" in error:
                             self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
                             USBserialPort = "timeout"
                 output = process.stdout.read()
                 error = process.stderr.read()
-                print error
-                print maybePort
+                print(error)
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
                     self.boldLine(displayOutputPlace,"this is the port:"+str(USBserialPort))
-                    print"This is the port: ", USBserialPort
+                    print(("This is the port: ", USBserialPort))
                     portFound = True
                     break
         if portFound == False:
@@ -332,7 +332,7 @@ class tester():
         ardOnUsb = False
         p = subprocess.Popen(r"system_profiler SPUSBDataType",stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
         output,error =p
-        print output
+        print(output)
         if "0x2341" in output:
             self.boldLine(displayOutputPlace,"Arduino is in USB list")
             ardOnUsb = True
@@ -352,10 +352,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("MEGA found on "+ USBserialPort )
             #again for cu.usbmodem...
@@ -367,10 +367,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("MEGA found on " + USBserialPort )
         if portFound == False:
@@ -403,11 +403,11 @@ class tester():
                     subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
                     #os.kill(process.pid, signal.SIGKILL) #use SIGKILL for not windows
                     #os.waitpid(-1, os.WNOHANG)              #use WHOHANG for not windows
-                    print "timed out"
+                    print("timed out")
                     output = process.stdout.read()
                     error = process.stderr.read()
-                    print "error:", error
-                    print "output", output
+                    print(("error:", error))
+                    print(("output", output))
                     if "timeout" in error:
                         self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
                         USBserialPort = "timeout"
@@ -415,7 +415,7 @@ class tester():
             error = process.stderr.read()
             if "avrdude.exe: AVR device initialized and ready to accept instructions" in error:
                 USBserialPort = maybePort
-                print" this is the port:",  USBserialPort
+                print((" this is the port:",  USBserialPort))
                 self.boldLine(displayOutputPlace, "Arduino found on "+str(USBserialPort))
         if USBserialPort == None: 
             self.boldLine(displayOutputPlace,"Arduino not found")
@@ -444,7 +444,7 @@ class tester():
             #m.start()  # equals the starting index of the last match
             #m.end()    # equals the ending index of the last match 
             rest = output[m.end():-1]
-            print "the rest:" ,rest
+            print(("the rest:" ,rest))
             match_found=False
             matches = re.finditer("tty", rest)
             for m in matches: match_found=True
@@ -462,11 +462,11 @@ class tester():
                 commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m328p -P " + maybePort + " -c stk500v1 -B5 -F"
                 commandwfile = commandAvrDude
                 output,error = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
                     self.boldLine(displayOutputPlace,"this is the port:"+str(USBserialPort))
-                    print"This is the port: ", USBserialPort
+                    print(("This is the port: ", USBserialPort))
                     portFound = True
         if portFound == False:
             self.boldLine(displayOutputPlace,"Arduino port not found in scan")
@@ -482,7 +482,7 @@ class tester():
         ardOnUsb = False
         p = subprocess.Popen(r"system_profiler SPUSBDataType",stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
         output,error =p
-        print output
+        print(output)
         if "0x2341" in output:
             self.boldLine(displayOutputPlace,"Arduino is in USB list")
             ardOnUsb = True
@@ -501,10 +501,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("UNO found on "+ USBserialPort )
             #again for cu.usbmodem...
@@ -516,10 +516,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("UNO found on " + USBserialPort )
         if portFound == False:
@@ -552,11 +552,11 @@ class tester():
                     subprocess.call(['taskkill', '/F', '/T', '/PID', str(process.pid)])
                     #os.kill(process.pid, signal.SIGKILL) #use SIGKILL for not windows
                     #os.waitpid(-1, os.WNOHANG)              #use WHOHANG for not windows
-                    print "timed out"
+                    print("timed out")
                     output = process.stdout.read()
                     error = process.stderr.read()
-                    print "error:", error
-                    print "output", output
+                    print(("error:", error))
+                    print(("output", output))
                     if "timeout" in error:
                         self.boldLine(displayOutputPlace, "Arduino stk500 progrmmer timeout")
                         USBserialPort = "timeout"
@@ -564,7 +564,7 @@ class tester():
             error = process.stderr.read()
             if "avrdude.exe: AVR device initialized and ready to accept instructions" in error:
                 USBserialPort = maybePort
-                print" this is the port:",  USBserialPort
+                print((" this is the port:",  USBserialPort))
                 self.boldLine(displayOutputPlace, "Arduino found on "+str(USBserialPort))
         if USBserialPort == None: 
             self.boldLine(displayOutputPlace,"Arduino not found")
@@ -595,7 +595,7 @@ class tester():
         if (match_found):
             displayOutputPlace.append("Arduino in dmesg")
             rest = output[m.end():-1]
-            print "the rest:" ,rest
+            print(("the rest:" ,rest))
             match_found=False
             matches = re.finditer("tty", rest)
             for m in matches: match_found=True
@@ -611,7 +611,7 @@ class tester():
         if (match_found):
             displayOutputPlace.append("Arduino Nano maybe in dmesg")
             rest = output[m.end():-1]
-            print "the rest:" ,rest
+            print(("the rest:" ,rest))
             match_found=False
             matches = re.finditer("tty", rest)
             for m in matches: match_found=True
@@ -632,11 +632,11 @@ class tester():
                 commandAvrDude = r"../avrdude  -C ../avrdude.conf -p m328p -P " + maybePort + " -c arduino -b 57600 -F"
                 commandwfile = commandAvrDude
                 output,error = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
                     self.boldLine(displayOutputPlace,"this is the port:"+str(USBserialPort))
-                    print"This is the port: ", USBserialPort
+                    print(("This is the port: ", USBserialPort))
                     portFound = True
         if portFound == False:
             self.boldLine(displayOutputPlace,"Arduino port not found in scan")
@@ -652,7 +652,7 @@ class tester():
         ardOnUsb = False
         p = subprocess.Popen(r"system_profiler SPUSBDataType",stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
         output,error =p
-        print output
+        print(output)
         if "FT232" in output:
             self.boldLine(displayOutputPlace,"Arduino Nano maybe in USB list")
             ardOnUsb = True
@@ -671,10 +671,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("Nano found on "+ USBserialPort )
             #again for cu.usbmodem...
@@ -686,10 +686,10 @@ class tester():
                 commandwfile = commandAvrDude
                 p = subprocess.Popen(commandwfile,stdout = subprocess.PIPE, stderr= subprocess.PIPE,shell=True).communicate()
                 output,error =p
-                print maybePort
+                print(maybePort)
                 if "avrdude: AVR device initialized and ready to accept instructions" in error:
                     USBserialPort = maybePort
-                    print" this is the port:",  USBserialPort
+                    print((" this is the port:",  USBserialPort))
                     portFound = True
                     displayOutputPlace.append("Nano found on " + USBserialPort )
         if portFound == False:
@@ -702,8 +702,8 @@ class tester():
 
     def boldLine(self, displayOutputPlace, txt):
         font=displayOutputPlace.currentFont()
-        font.setWeight(QFont.Bold)
+        font.setWeight(QtGui.QFont.Bold)
         displayOutputPlace.setCurrentFont(font)
         displayOutputPlace.append (txt)
-        font.setWeight(QFont.Normal)
+        font.setWeight(QtGui.QFont.Normal)
         displayOutputPlace.setCurrentFont(font)

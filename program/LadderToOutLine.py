@@ -69,7 +69,7 @@ class ladderToOutLine():
                     if stateUsers != [None]:
                         for x in range(1,len(stateUsers)): #run this for each of the stateUsers found
                             p=z
-                            print("$$$$$ making fake rung for State User", x)
+                            print(("$$$$$ making fake rung for State User", x))
                             #work from stateUser left and up:     
                             hitRung = False
                             if self.ORhere(p,0) == False: 
@@ -77,7 +77,7 @@ class ladderToOutLine():
                                 print("yes stateUser is on main rung")
                             
                             j = stateUsers[x][2] #start at StateUser and work left
-                            print("$$$$ pos of stateuser:",p,j)
+                            print(("$$$$ pos of stateuser:",p,j))
                             p,rightTurnList = self.loadRightTurns(p,j,hitRung)
                             #process as a Rung:
                             position = stateUsers[x][2] +1
@@ -93,19 +93,19 @@ class ladderToOutLine():
             #>>>> 
             if self.ORhere(i,0) == True and self.blankRow(i) == False:#
                 if self.isOutOnOR(i,width-1) == True:
-                    print("BRANCH W/OUTPUT: on branch at row", i) 
+                    print(("BRANCH W/OUTPUT: on branch at row", i))
                     hitRung = False
                     j = width-1# start at right
                     i,rightTurnList = self.loadRightTurns(i,j,hitRung)
                     #process as a Rung:
-                    #print("rightturnlist", rightTurnList)
+                    #print(("rightturnlist", rightTurnList))
                     self.processRung(i,branchList,outLine,nodeList,rightTurnList,width) 
 
                 
         #outline done, output.
         print("Outline:\n")
         for i in range(len(outLine)):
-            print(outLine[i])
+            print((outLine[i]))
         
         return outLine
 
@@ -132,13 +132,13 @@ class ladderToOutLine():
         for j in range(position): #go through cells on this row if it is a rung
                     
             #>>>Check for branch:
-            #print("$$$ p",p,"i",i,"righturnlist",rightTurnList)
+            #print(("$$$ p",p,"i",i,"righturnlist",rightTurnList))
             i = self.rightTurnListCheck(i,j, rightTurnList)
             self.branchStart(i,j,branchList,outLine,rightTurnList)# check for branch and add to branchList
             
             #>>>put in element if there is one:
             if j <position-1:
-                #print("adding element")
+                #print(("adding element"))
                 self.addElementToOutline(i,j,outLine)
             #>>>check for node Start:
             self.nodeStart(i,j,nodeList,outLine,branchList,rightTurnList)
@@ -152,7 +152,7 @@ class ladderToOutLine():
                 outLine.append([ "rungstate_"+str(self.grid[p][position-1].MTorElement) +"_"+ str(self.grid[p][position-1].variableName)])
             else:
                 outLine.append(["rungstate_"+str(self.grid[p][position-1].MTorElement) +"_"+ str(p) +"_"+ str(position-1)])
-            print("added", outLine[-1][0])
+            print(("added", outLine[-1][0]))
 
         
         
@@ -171,7 +171,7 @@ class ladderToOutLine():
             print("adding output")
             outLine.append(["output_" + str(self.grid[i][-1].variableName),\
                         str(self.grid[i][-1].ioAssign)])
-            print("added", outLine[-1][0])
+            print(("added", outLine[-1][0]))
             
         ##021##
         #>>>add result (math, move, ADC)
@@ -190,10 +190,10 @@ class ladderToOutLine():
                         str(self.grid[i][j].source_B), \
                         str(self.grid[i][j].const_A), \
                         str(self.grid[i][j].const_B)])
-            print("added", outLine[-1][0])
+            print(("added", outLine[-1][0]))
         
         #if self.grid[i][len(self.grid[i])-1].MTorElement != None: 
-        #    print("MEORELEMENT: ",self.grid[i][len(self.grid[i])-1].MTorElement)  
+        #    print(("MEORELEMENT: ",self.grid[i][len(self.grid[i])-1].MTorElement))
            
         if self.grid[i][len(self.grid[i])-1].MTorElement == "ADC" and\
                     width == position  : 
@@ -201,7 +201,7 @@ class ladderToOutLine():
             print("adding ADC")
             outLine.append(["ADC_" + str(self.grid[i][-1].variableName),\
                         str(self.grid[i][-1].ioAssign)])
-            print("added", outLine[-1][0])
+            print(("added", outLine[-1][0]))
             
         if self.grid[i][len(self.grid[i])-1].MTorElement == "PWM" and\
                     width == position  : 
@@ -210,7 +210,7 @@ class ladderToOutLine():
             outLine.append(["PWM_" + str(i)+"_"+str(j),\
                         str(self.grid[i][-1].ioAssign),\
                         str(self.grid[i][j].setPoint)])              
-            print("added", outLine[-1][0])
+            print(("added", outLine[-1][0]))
             
         outLine.append("//end rung \n")
         print("\n")
@@ -219,11 +219,11 @@ class ladderToOutLine():
         rightTurnList = [None] #will contain any right turn branches
         while hitRung == False:
             # go left to branch
-            print("i,j",i,j)
-            print("self.grid[i][j].branch:", self.grid[i][j].branch)
+            print(("i,j",i,j))
+            print(("self.grid[i][j].branch:", self.grid[i][j].branch))
             while self.grid[i][j].branch == False:
                 j = j-1
-            print("going up from i,j at branch" ,i,j)
+            print(("going up from i,j at branch" ,i,j))
             #go up to branch that goes left.  adding righturns as found
             i = i-1
             for g in range(1024): #max righturns 
@@ -292,10 +292,10 @@ class ladderToOutLine():
         unusedbrSTlist = [None,None]
         loc = [None,None]
         for x in range(len(tempOutLine)):
-            print("tempoutline x", tempOutLine[x])
+            print(("tempoutline x", tempOutLine[x]))
             if 'startBR' in tempOutLine[x]:
                 loc= tempOutLine[x][1]
-                print("startBR found" ,loc,tempOutLine[x])
+                print(("startBR found" ,loc,tempOutLine[x]))
                 foundInNode = False
                 for z in range(len(tempOutLine)):
                     if 'node_' in tempOutLine[x]:
@@ -371,7 +371,7 @@ class ladderToOutLine():
             z = i
             if self.grid[i][j].brchST == True:
                 if rightTurnList != None and len(rightTurnList)>1:
-                    print(">righturnlist being used<", rightTurnList) 
+            print((">righturnlist being used<", rightTurnList))
                     for x in range(1,len(rightTurnList)):
                         if rightTurnList[x] == [i,j]:
                             i = i+1
@@ -412,7 +412,7 @@ class ladderToOutLine():
         else:
             branchList.append([i,j]) #add the new branch location
         lastBranch  = len(branchList)-1
-        print("_____adding br_",str(branchList[lastBranch][0]),str(branchList[lastBranch][1]))
+        print(("_____adding br_",str(branchList[lastBranch][0]),str(branchList[lastBranch][1])))
         if start == True:
             outLine.append(["startBR",branchList[lastBranch]])
         else:
@@ -527,8 +527,8 @@ class ladderToOutLine():
        
     def outputnodelist(self, nodeList):
         for w in range(len(nodeList)):
-            print("      ",nodeList[w])
-        #print("\n")
+            print(("      ",nodeList[w]))
+        #print(("\n"))
     
     def countParallels(self,i,j):#Check how many parallel rows there are for this node:
         p=i #save i
@@ -572,7 +572,7 @@ class ladderToOutLine():
         height = len(self.grid)
         
         #>>>make node, set to current
-        print(">>>making new node ", i,j)
+        print((">>>making new node ", i,j))
         if nodeList[0] == [None]:
             nodeList[0] = [[i,j]]
             activeNode = 0    
@@ -599,7 +599,7 @@ class ladderToOutLine():
                 j = j-1
             
             #>>> add branch to branchlist
-            print(">>> adding this branch: ", i ,j)
+            print((">>> adding this branch: ", i ,j))
             self.branchAdd(i,j,branchList,outLine,False)  
             
             #>>>add branch to node at current node's i:
@@ -607,10 +607,10 @@ class ladderToOutLine():
         
             #>>>go up and add start branch to node at this j:
             p = nodeList[activeNode][-1][0]
-            print("p (=nodeList[activeNode][-1][0]) is ",p)
+            print(("p (=nodeList[activeNode][-1][0]) is ",p))
             while self.grid[p][j].brchST == False:# go up to brchST
                 p = p-1
-            print(">>> and adding start branch: ",  p,j)
+            print((">>> and adding start branch: ",  p,j))
             self.addToNode(activeNode,p,j,nodeList)#add branch from node's i and this j  
 
             #>>>head right

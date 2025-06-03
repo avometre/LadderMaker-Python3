@@ -13,6 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QGraphicsTextItem, QGraphicsRectItem, QGraphicsPixmapItem, QMessageBox
+from PyQt5.QtGui import QFont, QColor
 ##010##
 class cellStruct():
     def __init__(self, midPointX, midPointY, MTorElement, rungOrOR,\
@@ -232,9 +234,9 @@ class ManageGrid():
         height = len(self.grid)
         width = len(self.grid[0])
         for i in range(height):
-            print("row %d:" %i)
+            print(("row %d:" %i))
             for j in range(width):
-                print("%d:%d,%d " %(j,self.grid[i][j].midPointX,self.grid[i][j].midPointY))
+                print(("%d:%d,%d " %(j,self.grid[i][j].midPointX,self.grid[i][j].midPointY)))
         """ 
         self.changeRectangle()     
         #self.totalRedraw()
@@ -345,7 +347,7 @@ class ManageGrid():
         #check sparespots:
         for i in range(height):
             if spareSpot[i] == None: extraSpots = False
-        print("allcheck:", spareSpot)
+        print(("allcheck:", spareSpot))
             
         # now check the specific spot clicked:
         if extraSpots == True :# don't check if no other spots
@@ -365,7 +367,7 @@ class ManageGrid():
                         spareSpot[k] = j #apply the spare spot to rows below 
             else:
                 spareSpot[i] = None
-        print("this check:", spareSpot)
+        print(("this check:", spareSpot))
         #check sparespots:
         for i in range(height):
             if spareSpot[i] == None: extraSpots = False
@@ -404,19 +406,19 @@ class ManageGrid():
                 and i+1 != height \
                 and self.grid[i+1][0].rungOrOR == "OR"):
                             
-            #print "testing spot", i,j
+            #print("testing spot", i,j)
             #look down and see if there is an MT OR
             for k in range (i+1, height):
                 if self.grid[k][0].rungOrOR == "Rung":# hit rung below
-                    print(k, j, "hit rung")
+                    print((k, j, "hit rung"))
                     break
                 #check if there is an MT or in this spot, and if there is an MT beside it
                 elif self.grid[k][j].MTorElement == "MT":
                     if j==0:#on left, can shrink
-                        print(k, j, "on left, shrinkable")
+                        print((k, j, "on left, shrinkable"))
                         spotIsSpare = True
                     elif self.grid[k][j+1].MTorElement == "MT" or self.grid[k][j-1].MTorElement == "MT":
-                        print(k, j, "an MT beside")
+                        print((k, j, "an MT beside"))
                         spotIsSpare = True
         return spotIsSpare
     
@@ -429,20 +431,20 @@ class ManageGrid():
                 a = self.grid[i][j].MTorElement
                 b = self.grid[i][j].rungOrOR
                 
-                txt = self.scene.addText(("%s\n%s" %(a,b)),QtGui.QFont("Arial",8))
+                txt = self.scene.addText(("%s\n%s" %(a,b)),QFont("Arial",8))
                 txt.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-88)
-                txt.setDefaultTextColor (QtGui.QColor("lightgrey"))    
+                txt.setDefaultTextColor (QColor("lightgrey"))
                 if self.grid[i][j].branch ==True:
                     c = "branch  " +str(i)+","+str(j)
-                    txt = self.scene.addText(("%s" %(c)),QtGui.QFont("Arial",6))
+                    txt = self.scene.addText(("%s" %(c)),QFont("Arial",6))
                     txt.setPos(self.grid[i][j].midPointX-13,self.grid[i][j].midPointY-87)
                     txt.rotate(270)
                     
                 if self.grid[i][j].node ==True:
                     c = "node"
-                    txt = self.scene.addText(("%s" %(c)),QtGui.QFont("Arial",6))
+                    txt = self.scene.addText(("%s" %(c)),QFont("Arial",6))
                     txt.setPos(self.grid[i][j].midPointX+47,self.grid[i][j].midPointY-67)
-                    txt.setDefaultTextColor (QtGui.QColor("darkred"))
+                    txt.setDefaultTextColor (QColor("darkred"))
                     txt.rotate(270)
     
     def reportCellStartsEnds(self):
@@ -453,25 +455,25 @@ class ManageGrid():
                 
                 if self.grid[i][j].brchST ==True:
                     c = "B st " +str(i)+str(j)
-                    txt = self.scene.addText(("%s" %(c)),QtGui.QFont("Arial",7))
+                    txt = self.scene.addText(("%s" %(c)),QFont("Arial",7))
                     txt.setPos(self.grid[i][j].midPointX-5,self.grid[i][j].midPointY-67)
-                    txt.setDefaultTextColor (QtGui.QColor("darkred"))
+                    txt.setDefaultTextColor (QColor("darkred"))
         
                     txt.rotate(-85)
 
                     
                 if self.grid[i][j].nodeST ==True:
                     c = "N st "+str(i)+str(j) 
-                    txt = self.scene.addText(("%s" %(c)),QtGui.QFont("Arial",7))
+                    txt = self.scene.addText(("%s" %(c)),QFont("Arial",7))
                     txt.setPos(self.grid[i][j].midPointX+55,self.grid[i][j].midPointY-67)
-                    txt.setDefaultTextColor (QtGui.QColor("darkgreen"))
+                    txt.setDefaultTextColor (QColor("darkgreen"))
                     txt.rotate(-35)
                    
                 if self.grid[i][j].nodeE ==True:
                     c = "N E "+str(i)+str(j)
-                    txt = self.scene.addText(("%s" %(c)),QtGui.QFont("Arial",7))
+                    txt = self.scene.addText(("%s" %(c)),QFont("Arial",7))
                     txt.setPos(self.grid[i][j].midPointX+55,self.grid[i][j].midPointY-67)
-                    txt.setDefaultTextColor (QtGui.QColor("darkblue"))
+                    txt.setDefaultTextColor (QColor("darkblue"))
                     txt.rotate(-65)
                 
     def findBranchesAndNodes(self): ###NOTE: there are two of these: one here and one in LadderToC               
@@ -547,7 +549,7 @@ class ManageGrid():
         #BRANCH Starts :                
         for i in range(height-1):
             for j in range(width):
-                #print "branch ",i,j,self.grid[i][j].branch," branch i+1 ", self.grid[i+1][j].branch
+                #print("branch ",i,j,self.grid[i][j].branch," branch i+1 ", self.grid[i+1][j].branch)
                 #check if branchstart at rung:
                 if self.grid[i][j].branch == False and self.grid[i+1][j].branch == True:
                    self.grid[i][j].brchST = True
@@ -625,7 +627,7 @@ class ManageGrid():
         
     def placeIcon(self, cellNum, toolNum):
         pixmap = self.Tools.toolList[toolNum].pixmap
-        item = QtGui.QGraphicsPixmapItem(pixmap)
+        item = QGraphicsPixmapItem(pixmap)
         item.setPos(self.grid[cellNum[0]][cellNum[1]].midPointX+9,self.grid[cellNum[0]][cellNum[1]].midPointY-73)
         self.scene.addItem(item)
         
@@ -634,56 +636,56 @@ class ManageGrid():
         j = cellNum[1]
         if self.grid[i][j].variableName != None:
             elmtTxt = self.grid[i][j].variableName
-            item = QtGui.QGraphicsTextItem(elmtTxt)
-            item.setFont( QtGui.QFont("Arial",8))               
+            item = QGraphicsTextItem(elmtTxt)
+            item.setFont( QFont("Arial",8))
             item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-50)
             self.scene.addItem(item)
         if self.grid[i][j].comment != None:
             elmtTxt = self.grid[i][j].comment
-            item = QtGui.QGraphicsTextItem(elmtTxt)
-            item.setFont( QtGui.QFont("Arial",8))
+            item = QGraphicsTextItem(elmtTxt)
+            item.setFont( QFont("Arial",8))
             item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-88)
             self.scene.addItem(item)
         if self.grid[i][j].setPoint != None:
             elmtTxt = str(self.grid[i][j].setPoint)
-            item = QtGui.QGraphicsTextItem(elmtTxt)
-            item.setFont( QtGui.QFont("Arial",8))
+            item = QGraphicsTextItem(elmtTxt)
+            item.setFont( QFont("Arial",8))
             item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-40)
             self.scene.addItem(item)
         if self.grid[i][j].ioAssign != None and self.grid[i][j].ioAssign != "Internal":
             elmtTxt = self.grid[i][j].ioAssign
-            item = QtGui.QGraphicsTextItem(elmtTxt)
-            item.setFont( QtGui.QFont("Arial",6))
+            item = QGraphicsTextItem(elmtTxt)
+            item.setFont( QFont("Arial",6))
             item.setPos(self.grid[i][j].midPointX-5,self.grid[i][j].midPointY-78)
             self.scene.addItem(item)
-        #print "source_A:", self.grid[i][j].source_A
-        #print "const_A:", self.grid[i][j].const_A
-        #print "source_B:", self.grid[i][j].source_B
-        #print "const_B:", self.grid[i][j].const_B
+        #print("source_A:", self.grid[i][j].source_A)
+        #print("const_A:", self.grid[i][j].const_A)
+        #print("source_B:", self.grid[i][j].source_B)
+        #print("const_B:", self.grid[i][j].const_B)
         ##013##   larger number = lower position
         if self.grid[i][j].source_A != None:    #math funct is there
             if self.grid[i][j].source_A == "Constant":
                 elmtTxt = str(self.grid[i][j].const_A)
-                item = QtGui.QGraphicsTextItem(elmtTxt)
-                item.setFont( QtGui.QFont("Arial",8))
+                item = QGraphicsTextItem(elmtTxt)
+                item.setFont( QFont("Arial",8))
                 item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-85)
                 self.scene.addItem(item)
             else:
                 elmtTxt = self.grid[i][j].source_A
-                item = QtGui.QGraphicsTextItem(elmtTxt)
-                item.setFont( QtGui.QFont("Arial",8))
+                item = QGraphicsTextItem(elmtTxt)
+                item.setFont( QFont("Arial",8))
                 item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-85)
                 self.scene.addItem(item)
             if self.grid[i][j].source_B == "Constant":
                 elmtTxt = str(self.grid[i][j].const_B)
-                item = QtGui.QGraphicsTextItem(elmtTxt)
-                item.setFont( QtGui.QFont("Arial",8))
+                item = QGraphicsTextItem(elmtTxt)
+                item.setFont( QFont("Arial",8))
                 item.setPos(self.grid[i][j].midPointX,self.grid[i][j].midPointY-59)
                 self.scene.addItem(item)
             else:
                 elmtTxt = self.grid[i][j].source_B
-                item = QtGui.QGraphicsTextItem(elmtTxt)
-                item.setFont( QtGui.QFont("Arial",8))
+                item = QGraphicsTextItem(elmtTxt)
+                item.setFont( QFont("Arial",8))
                 item.setPos(self.grid[i][j].midPointX-5,self.grid[i][j].midPointY-59)
                 self.scene.addItem(item)
             
@@ -692,15 +694,15 @@ class ManageGrid():
     def changeRectangle(self):
         height = len(self.grid)
         width = len(self.grid[0]) 
-        #print "height before ", self.scene.sceneRect().height()
-        #print "x and y", self.scene.sceneRect().x(),self.scene.sceneRect().y()
+        #print("height before ", self.scene.sceneRect().height())
+        #print("x and y", self.scene.sceneRect().x(),self.scene.sceneRect().y())
         self.rectangle = self.scene.sceneRect()
         self.rectangle.setHeight((height*60)+20)
         self.rectangle.setWidth((width*60)+20)
         self.rectangle.setX(-12)
         self.rectangle.setY(-40)
         self.scene.setSceneRect(self.rectangle)
-        #print "new height ", self.scene.sceneRect().height()
+        #print("new height ", self.scene.sceneRect().height())
         
     def checkOrphanName(self,cellNum):#checks if an element will be connected to a non-existent register
         orphan = False
@@ -716,7 +718,7 @@ class ManageGrid():
                     #if cellNum[0] != i and cellNum[1] != j:
                     if self.grid[i][j].source_A == thisVarName or self.grid[i][j].source_A == thisVarName:
                         orphan = True
-                        messageBox = QtGui.QMessageBox()
+                        messageBox = QMessageBox()
                         messageBox.information(None,"Error"," Elements share this name")
                         #messageBox.exec_()
                         
