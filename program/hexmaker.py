@@ -25,7 +25,7 @@ class hexMaker():
     def __init__(self,opSys):#bring in all the things being sent down here
         self.opSys = opSys
         
-    def saveCfileAndCompile(self,C_txt,displayOutputPlace,currentHW):
+    def saveCfileAndCompile(self,C_txt,displayOutputPlace,currentHW, enable_serial_debugging):
         import subprocess
         from subprocess import PIPE
         import sys
@@ -63,6 +63,12 @@ class hexMaker():
             commandOut = r"../avr/bin/avr-gcc  -I. -T ../avr/lib/ldscripts/avr6.x -Wl,-Map,LADDER.out.map  -mmcu=atmega2560 -lm -o LADDER.out " 
             commandHex = r"../avr/bin/avr-objcopy -j .text -j .data -O ihex LADDER.out LADDER.hex"
             commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
+
+        if currentHW == "ATmega328P_Custom" and self.opSys == "NIX": # Mirror ArduinoUno
+            commandListo = r"../avr/bin/avr-gcc -x c -I. -g -mmcu=atmega328 -DF_CPU=16000000UL -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=LADDER.lst -c "
+            commandOut = r"../avr/bin/avr-gcc  -I. -T ../avr/lib/ldscripts/avr5.x -Wl,-Map,LADDER.out.map  -mmcu=atmega328 -lm -o LADDER.out "
+            commandHex = r"../avr/bin/avr-objcopy -j .text -j .data -O ihex LADDER.out LADDER.hex"
+            commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
             
         #MAC
         if currentHW == "Waltech" and self.opSys == "MAC":
@@ -85,6 +91,12 @@ class hexMaker():
         if currentHW == "ArduinoMega" and self.opSys == "MAC":
             commandListo = r"avr-gcc -x c -I. -g -mmcu=atmega2560 -DF_CPU=16000000UL -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=LADDER.lst -c "
             commandOut = r"avr-gcc  -I. -Wl,-Map,LADDER.out.map  -mmcu=atmega2560 -lm -o LADDER.out " 
+            commandHex = r"avr-objcopy -j .text -j .data -O ihex LADDER.out LADDER.hex"
+            commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
+
+        if currentHW == "ATmega328P_Custom" and self.opSys == "MAC": # Mirror ArduinoUno
+            commandListo = r"avr-gcc -x c -I. -g -mmcu=atmega328 -DF_CPU=16000000UL -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=LADDER.lst -c "
+            commandOut = r"avr-gcc  -I. -Wl,-Map,LADDER.out.map  -mmcu=atmega328 -lm -o LADDER.out "
             commandHex = r"avr-objcopy -j .text -j .data -O ihex LADDER.out LADDER.hex"
             commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
        
@@ -110,12 +122,61 @@ class hexMaker():
             commandOut =r"..\\WinAVR\\bin\\avr-gcc.exe  -I. -Wl,-Map,LADDER.out.map  -mmcu=atmega2560 -lm -o LADDER.out " 
             commandHex = r"..\\WinAVR\\bin\\avr-objcopy.exe -j .text -j .data -O ihex LADDER.out LADDER.hex"
             commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
+
+        if currentHW == "ATmega328P_Custom" and self.opSys == "WIN": # Mirror ArduinoUno
+            commandListo = r"..\\WinAVR\\bin\\avr-gcc.exe -x c -I. -g -mmcu=atmega328 -DF_CPU=16000000UL -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=LADDER.lst -c "
+            commandOut =r"..\\WinAVR\\bin\\avr-gcc.exe  -I. -Wl,-Map,LADDER.out.map  -mmcu=atmega328 -lm -o LADDER.out "
+            commandHex = r"..\\WinAVR\\bin\\avr-objcopy.exe -j .text -j .data -O ihex LADDER.out LADDER.hex"
+            commandAvrDude =tester(self.opSys,currentHW).test1(displayOutputPlace)
             
 #####run commands:   
         
         print "current dir:", os.getcwd()
         os.chdir("../helpers/hexes")
         print "current dir:", os.getcwd()
+
+        compile_uart_cmd = None
+        p_uart_returncode = 1 # Default to failure unless uart compilation is attempted and succeeds
+
+        if enable_serial_debugging:
+            mcu = ""
+            fcpu = ""
+            compiler_base = ""
+            # Common flags, including outputting a .lst file for uart.c
+            common_flags = "-x c -I. -g -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=uart.lst"
+
+            if "atmega328" in commandListo: mcu = "atmega328"
+            elif "atmega2560" in commandListo: mcu = "atmega2560"
+            elif "atmega32" in commandListo: mcu = "atmega32"
+
+            if "DF_CPU=16000000UL" in commandListo: fcpu = "16000000UL"
+            elif "DF_CPU=4000000UL" in commandListo: fcpu = "4000000UL"
+
+            if self.opSys == "NIX": compiler_base = "../avr/bin/avr-gcc"
+            elif self.opSys == "MAC": compiler_base = "avr-gcc"
+            elif self.opSys == "WIN": compiler_base = "..\\WinAVR\\bin\\avr-gcc.exe"
+
+            if mcu and fcpu and compiler_base:
+                # Path to uart.c is ../C/uart.c relative to helpers/hexes/
+                compile_uart_cmd = "{compiler} {flags} -mmcu={mcu} -DF_CPU={fcpu} -c ../C/uart.c -o uart.o".format(
+                    compiler=compiler_base, flags=common_flags, mcu=mcu, fcpu=fcpu)
+
+                print "Compile UART command:", compile_uart_cmd
+                displayOutputPlace.append("Compiling uart.c...")
+                p_uart = subprocess.Popen(compile_uart_cmd, shell=True, stdout=PIPE, stderr=PIPE)
+                uart_out, uart_err = p_uart.communicate()
+                p_uart_returncode = p_uart.returncode
+
+                if p_uart_returncode != 0:
+                    displayOutputPlace.append("uart.c compilation failed.")
+                    displayOutputPlace.append("Error: " + uart_err)
+                else:
+                    displayOutputPlace.append("uart.c compiled to uart.o successfully.")
+                    if uart_out: displayOutputPlace.append("Output: " + uart_out)
+                    if uart_err: displayOutputPlace.append("Warnings: " + uart_err) # Show stderr even on success for warnings
+            else:
+                displayOutputPlace.append("Could not determine MCU/F_CPU/Compiler for uart.c compilation. UART debugging will be disabled.")
+                enable_serial_debugging = False # Disable if we can't compile uart.c
         
         f = open('LLCode', 'w')
         f.write(C_txt)
@@ -137,15 +198,22 @@ class hexMaker():
         if p.returncode == 0:
             displayOutputPlace.append ( ".lst and .o file generated")
         
-        commandwfile =commandOut + filename + ".o"
-        p = subprocess.Popen(commandwfile, shell=True )
-        while p.poll() is None:# polls to see if the programming is done
-            time.sleep(0.5)
-        #print "Process ended, ret code:", p.returncode
-        if p.returncode != 0:
-            displayOutputPlace.append ( "out file failed")
-        if p.returncode == 0:
-           displayOutputPlace.append ( "out file generated")
+        link_objects = filename + ".o"
+        if enable_serial_debugging and p_uart_returncode == 0:
+            link_objects += " uart.o"
+
+        commandwfile_link = commandOut + link_objects
+        print "Linker command:", commandwfile_link
+        p_link = subprocess.Popen(commandwfile_link, shell=True, stdout=PIPE, stderr=PIPE)
+        link_out, link_err = p_link.communicate()
+
+        if p_link.returncode != 0:
+            displayOutputPlace.append ( "Linking failed")
+            displayOutputPlace.append ( "Error: " + link_err)
+        else:
+           displayOutputPlace.append ( "LADDER.out generated (linked successfully)")
+           if link_out: displayOutputPlace.append ( "Output: " + link_out)
+           if link_err: displayOutputPlace.append ( "Warnings: " + link_err) # Show stderr even on success for warnings
         
         
         commandwfile = commandHex      

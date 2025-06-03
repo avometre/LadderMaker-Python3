@@ -20,9 +20,10 @@ import sys
 
 class OutLineToC():
     
-    def __init__(self,grid,currentHW):#bring in all the things being sent down here
+    def __init__(self,grid,currentHW, enable_serial_debugging):#bring in all the things being sent down here
         self.grid = grid
         self.currentHW = currentHW
+        self.enable_serial_debugging = enable_serial_debugging
         
         if self.currentHW == "Waltech":
             #>>>inputs for Waltech IC
@@ -61,6 +62,16 @@ class OutLineToC():
             #mode8 PWM on 16 bit timer
             self.PWMList  = ["DDRB","1","TCCR1A","----","COM1A1","TCCR1B","WGM13","CS10","OCR1A","ICR1"],\
                             ["DDRB","2","TCCR1A","----","COM1B1","TCCR1B","WGM13","CS10","OCR1B","ICR1"]
+
+        if currentHW == "ATmega328P_Custom": # Mirror ArduinoUno for now
+            #>>>inputs
+            self.inPutList = ["PINC",4],["PINC",5],["PIND",2],["PIND",3]                        ,["PIND",4]
+            #>>>outputs:
+            self.outPutList =["PORTD",5],["PORTD",6],["PORTD",7]                        ,["PORTB",0],["PORTB",3],["PORTB",4],["PORTB",5]
+
+            self.ADCList  = ["DDRC",0,0],["DDRC",1,1],["DDRC",2,2],["DDRC",3,3]
+            #mode8 PWM on 16 bit timer
+            self.PWMList  = ["DDRB","1","TCCR1A","----","COM1A1","TCCR1B","WGM13","CS10","OCR1A","ICR1"],                        ["DDRB","2","TCCR1A","----","COM1B1","TCCR1B","WGM13","CS10","OCR1B","ICR1"]
             
         if currentHW == "ArduinoMega":
             #>>>inputs 
@@ -108,9 +119,12 @@ class OutLineToC():
     def makeC(self,outLine,displayOutputPlace):
         print("making C\n")
         
-        C_txt = "#include <stdint.h>\n#include <stdlib.h>\n#include <string.h>\n#include <avr/io.h>\n#include <avr/interrupt.h>\n\n"
+        C_txt = "#include <stdint.h>\n#include <stdlib.h>\n#include <string.h>\n#include <avr/io.h>\n#include <avr/interrupt.h>\n"
+        if self.enable_serial_debugging:
+            C_txt += "#include \"uart.h\"\n"
+        C_txt += "\n" # Add the newline that was after interrupt.h
         C_txt = C_txt +"volatile uint8_t timerOF=0;\n"
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"#define OVERSAMPLES 10\n"
             
             C_txt = C_txt +"static volatile uint16_t adcData;\n"
@@ -121,10 +135,10 @@ class OutLineToC():
         
         if self.currentHW == "Waltech":
             C_txt = C_txt +"inline ISR(TIMER0_OVF_vect){timerOF=1;}\n"
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"inline ISR(TIMER0_OVF_vect){timerOF=1;}\n"
         
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"inline ISR(ADC_vect)\n{\n"
             C_txt = C_txt +"    adcDataL = ADCL;\n"
             C_txt = C_txt +"    adcDataH = ADCH;\n"
@@ -147,7 +161,7 @@ class OutLineToC():
         C_txt = C_txt +"   return i;\n}\n"
         
         #ADC:
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"uint16_t read_adc(uint8_t channel)\n{\n"
             #C_txt = C_txt +"    sei();//set enable interrupts\n"    
             C_txt = C_txt +"    ADMUX = channel;// set channel\n"
@@ -162,45 +176,50 @@ class OutLineToC():
 
         C_txt = C_txt +"int main()\n"
         C_txt = C_txt +"{\n"
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"//set up ADC\n"    
             C_txt = C_txt +"    ADCSRA |= ( (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) );//  sets adc clock prescaler to 128 //checked\n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADIE); // enable ADC conversion complete interrupt\n"
             C_txt = C_txt +"    ADCSRA |= (1<<ADATE);// set to auto trigger (free running by default)\n"	
         C_txt = self.DDROutPuts(C_txt)#//do DDR's#//use outputlist to generate
         #pullups on for Arduino:
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = self.pullupInPuts(C_txt)
         C_txt = C_txt +"    //set up loop timer:\n"
         if self.currentHW == "Waltech":
             C_txt = C_txt +"    TIMSK |= (1<<TOIE0);// overflow capture enable\n"
             C_txt = C_txt +"    TCNT0 = 101;// start at this\n"
             C_txt = C_txt +"    TCCR0 |= (1<<CS02);// timer started with /256 prescaler  fills up @61 hz\n"
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"    TIMSK0 |= (1<<TOIE0);// overflow capture enable\n"
             C_txt = C_txt +"    TCNT0 = 101;// start at this\n"
             C_txt = C_txt +"    TCCR0B |= ((1<<CS10)|(1<<CS12));// timer started with /1024 prescaler \n "
             C_txt = self.setUpPWMs(outLine,C_txt)
             
         C_txt = C_txt +"    sei();\n"
+        if self.enable_serial_debugging:
+            C_txt = C_txt +"    uart_init();\n"
         C_txt = self.initVarsForMicro(outLine,C_txt)
         C_txt = C_txt +"    uint8_t W = 1;\n"
         C_txt = C_txt +"    while (1)\n"
         C_txt = C_txt +"    {\n"
         C_txt = C_txt +"        if (timerOF == 1)\n"
         C_txt = C_txt +"        {\n"
+        if self.enable_serial_debugging:
+            C_txt = C_txt +"           static uint16_t debug_loop_count = 0;\n"
+            C_txt = C_txt +"           uart_puts(\"Loop: \"); uart_putw_dec(debug_loop_count++); uart_puts(\"\\r\\n\");\n"
         
         if self.currentHW == "Waltech":
             C_txt = C_txt +"           timerOF=0;//reset timer flag\n"
             C_txt = C_txt +"           TCNT0 = 101;// start at this\n"
             C_txt = self.findInPuts(outLine,C_txt)
             
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             C_txt = C_txt +"           timerOF=0;//reset timer flag\n"
             C_txt = C_txt +"           TCNT0 = 101;// start at this\n"#ok
             C_txt = self.findInPutsArd(outLine,C_txt)
         
-        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano":
+        if self.currentHW == "ArduinoMega"or self.currentHW == "ArduinoUno" or self.currentHW == "ArduinoNano" or self.currentHW == "ATmega328P_Custom":
             pwmList = []
             for i in range (len(outLine)):
                 if "PWM_" == str(outLine[i][0])[:4] and outLine[i][1] not in pwmList:
@@ -357,7 +376,7 @@ class OutLineToC():
             print("found a MAC!")
         if opSys != "UNK":
             from hexmaker import hexMaker
-            hexMaker(opSys).saveCfileAndCompile(C_txt,displayOutputPlace,self.currentHW)
+            hexMaker(opSys).saveCfileAndCompile(C_txt,displayOutputPlace,self.currentHW, self.enable_serial_debugging)
         else: print("Op Sys not detected")
         
         

@@ -28,6 +28,7 @@ from math_ui import Ui_MathDialog
 from ADC_ui import Ui_ADCDialog
 from PWM_ui import Ui_PWMDialog
 from wrongVersion_ui import Ui_wrongVersionDialog
+import os
 
 
 ##007##
@@ -270,6 +271,24 @@ class ArduinoNanoIOHelpDialog(QtWidgets.QDialog):
         with open ("ArdNanoIO.html", 'r') as myfile:
             helpHtml=myfile.read()
         self.ui.textBrowser.setHtml(helpHtml)
+
+class ATmega328PCustomIOHelpDialog(QtWidgets.QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent) # Python 3 style super, consistent with other dialogs in this file
+        self.ui = Ui_IODialog()
+        self.ui.setupUi(self)
+        html_file_name = "ATmega328PCustomIO.html"
+        try:
+            # Assuming CWD is 'program' when main.py is executed
+            with open(html_file_name, 'r') as myfile:
+                helpHtml = myfile.read()
+            self.ui.textBrowser.setHtml(helpHtml)
+        except IOError as e: # Catching IOError which covers FileNotFoundError for Py2/3
+            error_message = "<html><body><h1>Error</h1>"
+            error_message += "<p>Could not load help file: {}</p>".format(html_file_name)
+            error_message += "<p>CWD: {}</p>".format(os.getcwd())
+            error_message += "<p>Error details: {}</p></body></html>".format(str(e))
+            self.ui.textBrowser.setHtml(error_message)
         
 class ArduinoMegaIOHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
