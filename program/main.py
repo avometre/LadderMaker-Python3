@@ -68,7 +68,8 @@ import re
 import pickle #for saving the file
 from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg, QtPrintSupport
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QActionGroup, QGraphicsScene, QGraphicsTextItem, QGraphicsRectItem, QTableWidgetItem, QGraphicsPixmapItem, QWhatsThis
-from PyQt5.QtGui import QPrinter, QPainter, QFont, QColor, QPixmap
+from PyQt5.QtGui import QPainter, QFont, QColor, QPixmap
+from PyQt5.QtPrintSupport import QPrinter
 from PyQt5.QtCore import Qt
 # from PyQt4.Qt import QString # QString is typically replaced by str in PyQt5
 # from PyQt4.Qt import QStringList # QStringList is typically replaced by list of str in PyQt5

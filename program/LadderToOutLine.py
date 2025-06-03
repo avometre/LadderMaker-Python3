@@ -371,12 +371,13 @@ class ladderToOutLine():
             z = i
             if self.grid[i][j].brchST == True:
                 if rightTurnList != None and len(rightTurnList)>1:
-            print((">righturnlist being used<", rightTurnList))
-                    for x in range(1,len(rightTurnList)):
-                        if rightTurnList[x] == [i,j]:
-                            i = i+1
-                            while self.grid[i][j].MTorElement == "MT":#need to check for MT
-                                i = i+1 
+                    if True:
+                        print((">righturnlist being used<", rightTurnList))
+                        for x in range(1,len(rightTurnList)):
+                            if rightTurnList[x] == [i,j]:
+                                i = i+1
+                                while self.grid[i][j].MTorElement == "MT":#need to check for MT
+                                    i = i+1 
             c=c+1
             if c>1024: break
             if z == i: doneGoingRight = True

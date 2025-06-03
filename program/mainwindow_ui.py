@@ -481,4 +481,4 @@ class Ui_MainWindow(object):
         self.actionArduinoMega.setText(_translate("MainWindow", "Arduino Mega"))
         self.actionArduinoNano.setText(_translate("MainWindow", "Arduino Nano"))
         self.actionArduinoNano_IO.setText(_translate("MainWindow", "Arduino Nano IO"))
-from . import toolbaricons_rc
+import toolbaricons_rc

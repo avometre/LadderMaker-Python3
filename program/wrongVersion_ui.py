@@ -7,7 +7,7 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -16,23 +16,23 @@ except AttributeError:
         return s
 
 try:
-    _encoding = QtGui.QApplication.UnicodeUTF8
+    _encoding = QtWidgets.QApplication.UnicodeUTF8
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig, _encoding)
+        return QtWidgets.QApplication.translate(context, text, disambig, _encoding)
 except AttributeError:
     def _translate(context, text, disambig):
-        return QtGui.QApplication.translate(context, text, disambig)
+        return QtWidgets.QApplication.translate(context, text, disambig)
 
 class Ui_wrongVersionDialog(object):
     def setupUi(self, wrongVersionDialog):
         wrongVersionDialog.setObjectName(_fromUtf8("wrongVersionDialog"))
         wrongVersionDialog.resize(312, 84)
-        self.buttonBox = QtGui.QDialogButtonBox(wrongVersionDialog)
+        self.buttonBox = QtWidgets.QDialogButtonBox(wrongVersionDialog)
         self.buttonBox.setGeometry(QtCore.QRect(70, 40, 171, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtGui.QDialogButtonBox.Cancel|QtGui.QDialogButtonBox.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
-        self.label = QtGui.QLabel(wrongVersionDialog)
+        self.label = QtWidgets.QLabel(wrongVersionDialog)
         self.label.setGeometry(QtCore.QRect(20, 10, 271, 21))
         palette = QtGui.QPalette()
         brush = QtGui.QBrush(QtGui.QColor(170, 0, 0))
@@ -62,8 +62,8 @@ class Ui_wrongVersionDialog(object):
 
 if __name__ == "__main__":
     import sys
-    app = QtGui.QApplication(sys.argv)
-    wrongVersionDialog = QtGui.QDialog()
+    app = QtWidgets.QApplication(sys.argv)
+    wrongVersionDialog = QtWidgets.QDialog()
     ui = Ui_wrongVersionDialog()
     ui.setupUi(wrongVersionDialog)
     wrongVersionDialog.show()
