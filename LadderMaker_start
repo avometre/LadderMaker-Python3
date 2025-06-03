@@ -1,0 +1,14 @@
+import os
+import subprocess
+import sys
+
+# Get the directory where LadderMaker_start is located
+script_dir = os.path.dirname(os.path.abspath(__file__))
+program_dir = os.path.join(script_dir, "program")
+
+# Change the current working directory to the 'program' directory
+os.chdir(program_dir)
+
+# Run main.py using the same Python interpreter that is running this script
+# and pass along any command-line arguments
+subprocess.run([sys.executable, "main.py"] + sys.argv[1:])

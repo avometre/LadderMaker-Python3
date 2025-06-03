@@ -1,0 +1,4 @@
+Too many inputs and outputs for mega, last 8 where removed and used for analog.
+
+List shortened in popupdialogs.py
+Diagram not fixed

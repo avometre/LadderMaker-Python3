@@ -1,0 +1,135 @@
+processing rung
+adding output
+added output_Name_2
+
+
+Outline:
+
+//Start of Ladder:
+//rung at 0
+['cont_Name_1', 'contNO', 'in_1']
+['output_Name_2', 'out_1']
+//end rung 
+
+making C
+
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
+volatile uint8_t timerOF=0;
+#define OVERSAMPLES 10
+static volatile uint16_t adcData;
+static volatile uint16_t ADCtotal;
+static volatile uint8_t adcDataL;
+static volatile uint8_t adcDataH;
+static volatile uint8_t sample_count;
+inline ISR(TIMER0_OVF_vect){timerOF=1;}
+inline ISR(ADC_vect)
+{
+    adcDataL = ADCL;
+    adcDataH = ADCH;
+    adcData = 0;
+    adcData = adcData | adcDataH;
+    adcData = adcData << 8;
+    adcData = adcData | adcDataL;
+    ADCtotal = ADCtotal+adcData;
+    sample_count ++;
+}
+int16_t do_math(int16_t A,int16_t B,char operator)
+{
+    int32_t result = 0;
+    if (operator == '+'){result = A+B;}
+    if (operator == '-'){result = A-B;}
+    if (operator == '*'){result = A*B;}
+    if (operator == '/'){result = A/B;}
+//    if (operator == '='){result = A = B;}
+    int16_t i =  ((result >> 0) & 0xffff);
+   return i;
+}
+uint16_t read_adc(uint8_t channel)
+{
+    ADMUX = channel;// set channel
+    ADMUX |=  (1<<REFS0);// sets ref volts to Vcc
+    ADCSRA |= (1<<ADEN); // enable the ADC
+    sample_count = 0; ADCtotal = 0;//clear sample count
+    ADCSRA |= (1<<ADSC);//start conversion
+    //read adcData done in interrupt
+    while (sample_count < OVERSAMPLES){asm volatile ("nop"::);}//wait for completion
+    ADCSRA &=~ (1<<ADEN); // stop the ADC
+    return (ADCtotal/OVERSAMPLES); //mx osamples = 63  othewise will overflow total register with 10 bit adc results
+}
+int main()
+{
+//set up ADC
+    ADCSRA |= ( (1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0) );//  sets adc clock prescaler to 128 //checked
+    ADCSRA |= (1<<ADIE); // enable ADC conversion complete interrupt
+    ADCSRA |= (1<<ADATE);// set to auto trigger (free running by default)
+   DDRD |= (1<<5);
+   DDRD |= (1<<6);
+   DDRD |= (1<<7);
+   DDRB |= (1<<0);
+   DDRB |= (1<<3);
+   DDRB |= (1<<4);
+   DDRB |= (1<<5);
+
+   PORTC |= (1<<4);
+   PORTC |= (1<<5);
+   PORTD |= (1<<2);
+   PORTD |= (1<<3);
+   PORTD |= (1<<4);
+
+    //set up loop timer:
+    TIMSK0 |= (1<<TOIE0);// overflow capture enable
+    TCNT0 = 101;// start at this
+    TCCR0B |= ((1<<CS10)|(1<<CS12));// timer started with /1024 prescaler 
+     sei();
+    uint8_t cont_Name_1_NO = 0;
+    uint8_t output_Name_2 = 0;
+    uint8_t W = 1;
+    while (1)
+    {
+        if (timerOF == 1)
+        {
+           timerOF=0;//reset timer flag
+           TCNT0 = 101;// start at this
+           //inputs:
+           cont_Name_1_NO =~ PINC &(1<<4);
+
+            //Start of Ladder:
+            //rung at 0
+             W = 1;
+             if(cont_Name_1_NO == 0){W = 0;}
+              output_Name_2 = W;
+            //end rung 
+
+           //outputs:
+         if(output_Name_2 == 0){PORTD &=~ (1<<5);}
+         else {PORTD |= (1<<5);}
+
+       }
+   }
+}
+
+saving C and Compiling
+checked platform linux2
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/program
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/helpers/hexes
+looking for programming hardware on usb
+the rest:  Due] on usb-0000:00:1d.7-7/input2
+/dev/ttyACM0
+/dev/ttyACM1
+/dev/ttyACM2
+/dev/ttyACM3
+/dev/ttyACM4
+/dev/ttyACM5
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/program
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/program
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/helpers/hexes
+../avr/bin/avr-gcc -x c -I. -g -mmcu=atmega328 -DF_CPU=16000000UL -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall -std=gnu99 -Wa,-ahlms=LADDER.lst -c LLCode
+Process ended, ret code 0
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a
+current dir: /media/karl/c084862f-6c83-4ae2-9a8f-2e3dabd275dc/all_files/Circuits2009/Python_projects/ladder/latest_versions/ladder_maker_allOS_110a/program
