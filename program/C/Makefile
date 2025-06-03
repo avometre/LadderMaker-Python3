@@ -4,7 +4,7 @@ MCU_FREQ := 16000000UL
 
 # Name of our project
 # (use a single word, e.g. 'myproject')
-PROJECTNAME=pwm_test_$(VER)
+PROJECTNAME=ladder_logic_main
 
 # Source files
 # List C/C++/Assembly source files:
@@ -36,13 +36,13 @@ OPTLEVEL=s
 # avr910, avrisp, bsd, pony and more.  Set this to
 # one of the valid "-c PROGRAMMER-ID" values 
 # described in the avrdude info page.
-# 
-AVRDUDE_PROGRAMMERID=stk500
+# Can be overridden by setting the environment variable, e.g. make AVRDUDE_PROGRAMMERID=usbasp writeflash
+AVRDUDE_PROGRAMMERID ?= stk500
 
 # port--serial or parallel port to which your 
 # hardware programmer is attached
-#
-AVRDUDE_PORT=/dev/ttyS0
+# Can be overridden, e.g. make AVRDUDE_PORT=/dev/ttyUSB0 writeflash
+AVRDUDE_PORT ?= /dev/ttyS0
 
 
 ####################################################
@@ -65,10 +65,12 @@ HEXFORMAT=ihex
 CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -DF_CPU=$(MCU_FREQ) -O$(OPTLEVEL) \
 	-fpack-struct -fshort-enums             \
 	-funsigned-bitfields -funsigned-char    \
-	-Wall -std=gnu99               \
+	-Wall -Wextra -std=gnu99               \
+	-ffunction-sections -fdata-sections \
 	-Wa,-ahlms=$(firstword                  \
 	$(filter %.lst, $(<:.c=.lst)))\
 	-DVERSION=$(VER)
+# -ffunction-sections and -fdata-sections place each function and data item into its own section in the output file.
 
 # c++ specific flags
 CPPFLAGS=-fno-exceptions               \
@@ -86,14 +88,20 @@ ASMFLAGS =-I. $(INC) -mmcu=$(MCU)        \
 
 # linker
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU) \
+	-Wl,--gc-sections \
 	-lm $(LIBS)
+# -Wl,--gc-sections tells the linker to remove unused sections (requires -ffunction-sections and -fdata-sections CFLAGS).
 
 ##### executables ####
-CC=avr-gcc
-OBJCOPY=avr-objcopy
-OBJDUMP=avr-objdump
-SIZE=avr-size
-AVRDUDE=avrdude
+# Prefix for AVR tools (e.g., /usr/local/CrossPack-AVR/bin/)
+# Can be overridden by setting the environment variable, e.g., make AVR_TOOLS_PREFIX=/path/to/avr/bin/ all
+AVR_TOOLS_PREFIX ?=
+
+CC=$(AVR_TOOLS_PREFIX)avr-gcc
+OBJCOPY=$(AVR_TOOLS_PREFIX)avr-objcopy
+OBJDUMP=$(AVR_TOOLS_PREFIX)avr-objdump
+SIZE=$(AVR_TOOLS_PREFIX)avr-size
+AVRDUDE=$(AVR_TOOLS_PREFIX)avrdude
 REMOVE=rm -f
 
 ##### automatic target names ####
