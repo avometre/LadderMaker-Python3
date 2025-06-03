@@ -13,8 +13,8 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 # -*- coding: utf-8 -*- 
 
 #this wil be the outline to C functions
-from PyQt4 import QtCore, QtGui
-from PyQt4.Qt import QFont
+from PyQt5 import QtCore, QtGui
+from PyQt5.QtGui import QFont
 from managegrid import ManageGrid  
 import sys     
 
@@ -106,7 +106,7 @@ class OutLineToC():
 
         
     def makeC(self,outLine,displayOutputPlace):
-        print "making C\n"
+        print("making C\n")
         
         C_txt = "#include <stdint.h>\n#include <stdlib.h>\n#include <string.h>\n#include <avr/io.h>\n#include <avr/interrupt.h>\n\n"
         C_txt = C_txt +"volatile uint8_t timerOF=0;\n"
@@ -224,7 +224,7 @@ class OutLineToC():
                 C_txt = C_txt + "             branch_"+\
                         str(outLine[i][1][0])+"_"+str(outLine[i][1][1])+ " = 1;\n"
                 currentBranchList.append(outLine[i][1])#this keeps track of the nested branches
-            #print "current branch", currentBranchList
+            #print("current branch", currentBranchList)
             #COMPARISONS:
             ##027##
             #"Equals" "Greater""Lessthan""GreaterOrEq""LessOrEq"
@@ -290,7 +290,7 @@ class OutLineToC():
                     m = 0
                     while m < len(currentBranchList):
                         if currentBranchList[m] == [a,b]: 
-                            #print "A,B here"
+                            #print("A,B here")
                             currentBranchList.pop(m)
                         else: m = m+1
 
@@ -340,12 +340,12 @@ class OutLineToC():
         C_txt = C_txt + "       }\n" #end of conditional
         C_txt = C_txt + "   }\n" #end of main loop
         C_txt = C_txt + "}\n" #end of main
-        print C_txt
+        print(C_txt)
         
-        print "saving C and Compiling"
+        print("saving C and Compiling")
         
         plat = sys.platform.lower()	# try to detect the OS so that a device can be selected...
-        print "checked platform", plat
+        print(("checked platform", plat))
         opSys = "UNK" #default
         
         if   plat[:5] == 'linux': #linux
@@ -354,11 +354,11 @@ class OutLineToC():
             opSys = "WIN"
         elif plat == "darwin": #mac
             opSys = "MAC"
-            print "found a MAC!"
+            print("found a MAC!")
         if opSys != "UNK":
             from hexmaker import hexMaker
             hexMaker(opSys).saveCfileAndCompile(C_txt,displayOutputPlace,self.currentHW)
-        else: print "Op Sys not detected"
+        else: print("Op Sys not detected")
         
         
         
@@ -381,7 +381,7 @@ class OutLineToC():
                 if outLine[i][1] == "contNC" and microPinString not in C_txt:
                     C_txt = C_txt + "           "+str(outLine[i][0])+"_NC =~ "+microPinString
             #link inputs to outputs if names shared:
-            #print "linking output names"
+            #print("linking output names")
             if len(outLine[i])>1 and outLine[i][1] == "contNO":
                 basename = (str(outLine[i][0])[5:])
                 for x in range (len(outLine)):
@@ -423,7 +423,7 @@ class OutLineToC():
                 if outLine[i][1] == "contNC" and microPinString not in C_txt:
                     C_txt = C_txt + "           "+str(outLine[i][0])+"_NC = "+microPinString
             #link inputs to outputs if names shared:
-            #print "linking output names"
+            #print("linking output names")
             if len(outLine[i])>1 and outLine[i][1] == "contNO":
                 basename = (str(outLine[i][0])[5:])
                 for x in range (len(outLine)):
@@ -574,7 +574,7 @@ class OutLineToC():
         if outline[line][1] == "Mult": Operator = "\'*\'"
         if outline[line][1] == "Divide": Operator = "\'/'"
         #if outline[line][1] == "Move": Operator ="\'=\'"
-        print "operator",Operator
+        print(("operator",Operator))
         C_txt = C_txt +"            if (W == 1){\n                 "+str(outline[line][0])+" = "
         if outline[line][2] == "Constant":
             C_txt = C_txt +" do_math("+str(outline[line][4])+","
@@ -610,29 +610,29 @@ class OutLineToC():
         #determine if output (8 bit unsigned) or result (16 bit signed)
         outputName = None
         for i in range (len(outline)):                  #check for Results first
-            #print "compare to", str(outline[i][0])
+            #print("compare to", str(outline[i][0]))
             if len(outline[i])>1 and  str(outline[i][0]) == "Result_"+str(thisLine[pos]):
                 outputName = "Result_"+ str(thisLine[pos])
                 return outputName
         for i in range (len(outline)):                  
-            #print "compare to", str(outline[i][0])
+            #print("compare to", str(outline[i][0]))
             if len(outline[i])>1 and  str(outline[i][0]) == "Counter_"+str(thisLine[pos]):
                 outputName = "reg_Counter_"+ str(thisLine[pos])
                 return outputName
         for i in range (len(outline)):                  
-            #print "compare to", str(outline[i][0])
+            #print("compare to", str(outline[i][0]))
             if len(outline[i])>1 and  str(outline[i][0]) == "Timer_"+str(thisLine[pos]):
                 outputName = "reg_Timer_"+ str(thisLine[pos])
                 return outputName
         for i in range (len(outline)):                  
-            #print "compare to", str(outline[i][0])
+            #print("compare to", str(outline[i][0]))
             if len(outline[i])>1 and  str(outline[i][0]) == "ADC_"+str(thisLine[pos]):
                 outputName = "reg_ADC_"+ str(thisLine[pos])
                 return outputName
         for i in range (len(outline)):
             if len(outline[i])>1 and  str(outline[i][0]) == "output_"+str(thisLine[pos]):
                 outputName = "output_"+ str(thisLine[pos])
-                print "comparing to a binary output" 
+                print("comparing to a binary output")
         return outputName
         
     #go through grid and assign outputs to variables 

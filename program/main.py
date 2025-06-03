@@ -66,38 +66,30 @@ import os
 import time
 import re
 import pickle #for saving the file
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5 import QtSvg
-from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QActionGroup
-from PyQt5.QtGui import QPrinter, QPainter
+from PyQt5 import QtCore, QtGui, QtWidgets, QtSvg, QtPrintSupport
+from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QActionGroup, QGraphicsScene, QGraphicsTextItem, QGraphicsRectItem, QTableWidgetItem, QGraphicsPixmapItem, QWhatsThis
+from PyQt5.QtGui import QPrinter, QPainter, QFont, QColor, QPixmap
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
 # from PyQt4.Qt import QString # QString is typically replaced by str in PyQt5
 # from PyQt4.Qt import QStringList # QStringList is typically replaced by list of str in PyQt5
 
 from mainwindow_ui import Ui_MainWindow
 
 
-try:
-    _fromUtf8 = QtCore.QString.fromUtf8
-except AttributeError:
-    _fromUtf8 = lambda s: s
-
-
 class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
 
     def __init__(self):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__()# Constructs a dialog with parent parent. self being ImageDailog
         # Set up the UI from Designer:
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.graphicsView.DontAdjustForAntialiasing #seems to help fix artifacts left by mouse track markers
         #make a scene:
-        self.scene = QtGui.QGraphicsScene()
+        self.scene = QGraphicsScene()
 
         #set it to show in the graphicsview window:
         self.ui.graphicsView.setScene(self.scene)
-        self.items=[QtGui.QGraphicsTextItem(),QtGui.QGraphicsRectItem()]#for squares and indexes that follow mouse
+        self.items=[QGraphicsTextItem(),QGraphicsRectItem()]#for squares and indexes that follow mouse
         self.ui.graphicsView.viewport().installEventFilter(self)#for mouse functions
         #Setup IO table on right
         self.ui.tableWidget.resizeColumnToContents(0)
@@ -141,32 +133,32 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
 
         ##003##
         #action group for tool buttons:
-        self.connect(self.ui.actionContNO, QtCore.SIGNAL("triggered()"),lambda who="contNO": self.anyButton(who))
-        self.connect(self.ui.actionContNC, QtCore.SIGNAL("triggered()"),lambda who="contNC": self.anyButton(who))
-        self.connect(self.ui.actionCoil, QtCore.SIGNAL("triggered()"),lambda who="Coil": self.anyButton(who))
-        #self.connect(self.ui.actionCoilNot, QtCore.SIGNAL("triggered()"),lambda who="CoilNot": self.anyButton(who))
-        self.connect(self.ui.actionaddRung, QtCore.SIGNAL("triggered()"),lambda who="addRung": self.anyButton(who))
-        self.connect(self.ui.actionWiden, QtCore.SIGNAL("triggered()"),lambda who="Widen": self.anyButton(who))
-        #self.connect(self.ui.actionORbranch, QtCore.SIGNAL("triggered()"),lambda who="blankOR": self.anyButton(who))
-        self.connect(self.ui.actionDEL, QtCore.SIGNAL("triggered()"),lambda who="Del": self.anyButton(who))
-        self.connect(self.ui.actionORwire, QtCore.SIGNAL("triggered()"),lambda who="ORwire": self.anyButton(who))
-        self.connect(self.ui.actionNarrow, QtCore.SIGNAL("triggered()"),lambda who="Narrow": self.anyButton(who))
-        #self.connect(self.ui.actionRising, QtCore.SIGNAL("triggered()"),lambda who="Rising": self.anyButton(who))
-        self.connect(self.ui.actionFalling, QtCore.SIGNAL("triggered()"),lambda who="Fall": self.anyButton(who))
-        self.connect(self.ui.actionTimer, QtCore.SIGNAL("triggered()"),lambda who="Timer": self.anyButton(who))
-        self.connect(self.ui.actionCounter, QtCore.SIGNAL("triggered()"),lambda who="Counter": self.anyButton(who))
-        self.connect(self.ui.actionEquals, QtCore.SIGNAL("triggered()"),lambda who="Equals": self.anyButton(who))
-        self.connect(self.ui.actionPlus, QtCore.SIGNAL("triggered()"),lambda who="Plus": self.anyButton(who))
-        self.connect(self.ui.actionMinus, QtCore.SIGNAL("triggered()"),lambda who="Minus": self.anyButton(who))
-        self.connect(self.ui.actionMove, QtCore.SIGNAL("triggered()"),lambda who="Move": self.anyButton(who))
-        self.connect(self.ui.actionMult, QtCore.SIGNAL("triggered()"),lambda who="Mult": self.anyButton(who))
-        self.connect(self.ui.actionGreater, QtCore.SIGNAL("triggered()"),lambda who="Greater": self.anyButton(who))
-        self.connect(self.ui.actionLessthan, QtCore.SIGNAL("triggered()"),lambda who="Lessthan": self.anyButton(who))
-        self.connect(self.ui.actionGreaterOrEq, QtCore.SIGNAL("triggered()"),lambda who="GreaterOrEq": self.anyButton(who))
-        self.connect(self.ui.actionLessOrEq, QtCore.SIGNAL("triggered()"),lambda who="LessOrEq": self.anyButton(who))
-        self.connect(self.ui.actionPWM, QtCore.SIGNAL("triggered()"),lambda who="PWM": self.anyButton(who))
-        self.connect(self.ui.actionADC, QtCore.SIGNAL("triggered()"),lambda who="ADC": self.anyButton(who))
-        self.connect(self.ui.actionDivide, QtCore.SIGNAL("triggered()"),lambda who="Divide": self.anyButton(who))
+        self.ui.actionContNO.triggered.connect(lambda who="contNO": self.anyButton(who))
+        self.ui.actionContNC.triggered.connect(lambda who="contNC": self.anyButton(who))
+        self.ui.actionCoil.triggered.connect(lambda who="Coil": self.anyButton(who))
+        #self.ui.actionCoilNot.triggered.connect(lambda who="CoilNot": self.anyButton(who))
+        self.ui.actionaddRung.triggered.connect(lambda who="addRung": self.anyButton(who))
+        self.ui.actionWiden.triggered.connect(lambda who="Widen": self.anyButton(who))
+        #self.ui.actionORbranch.triggered.connect(lambda who="blankOR": self.anyButton(who))
+        self.ui.actionDEL.triggered.connect(lambda who="Del": self.anyButton(who))
+        self.ui.actionORwire.triggered.connect(lambda who="ORwire": self.anyButton(who))
+        self.ui.actionNarrow.triggered.connect(lambda who="Narrow": self.anyButton(who))
+        #self.ui.actionRising.triggered.connect(lambda who="Rising": self.anyButton(who))
+        self.ui.actionFalling.triggered.connect(lambda who="Fall": self.anyButton(who))
+        self.ui.actionTimer.triggered.connect(lambda who="Timer": self.anyButton(who))
+        self.ui.actionCounter.triggered.connect(lambda who="Counter": self.anyButton(who))
+        self.ui.actionEquals.triggered.connect(lambda who="Equals": self.anyButton(who))
+        self.ui.actionPlus.triggered.connect(lambda who="Plus": self.anyButton(who))
+        self.ui.actionMinus.triggered.connect(lambda who="Minus": self.anyButton(who))
+        self.ui.actionMove.triggered.connect(lambda who="Move": self.anyButton(who))
+        self.ui.actionMult.triggered.connect(lambda who="Mult": self.anyButton(who))
+        self.ui.actionGreater.triggered.connect(lambda who="Greater": self.anyButton(who))
+        self.ui.actionLessthan.triggered.connect(lambda who="Lessthan": self.anyButton(who))
+        self.ui.actionGreaterOrEq.triggered.connect(lambda who="GreaterOrEq": self.anyButton(who))
+        self.ui.actionLessOrEq.triggered.connect(lambda who="LessOrEq": self.anyButton(who))
+        self.ui.actionPWM.triggered.connect(lambda who="PWM": self.anyButton(who))
+        self.ui.actionADC.triggered.connect(lambda who="ADC": self.anyButton(who))
+        self.ui.actionDivide.triggered.connect(lambda who="Divide": self.anyButton(who))
 
 
         ##002##
@@ -201,11 +193,10 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
 
         toolActionGroup.setExclusive(True)
 
-        self.connect(self.ui.actionWaltech, QtCore.SIGNAL("triggered()"),lambda HW="Waltech": self.chooseHW(HW))
-        self.connect(self.ui.actionArduinoUno, QtCore.SIGNAL("triggered()"),lambda HW="ArduinoUno": self.chooseHW(HW))
-        self.connect(self.ui.actionArduinoNano, QtCore.SIGNAL("triggered()"),lambda HW="ArduinoNano": self.chooseHW(HW))
-        self.connect(self.ui.actionArduinoMega, QtCore.SIGNAL("triggered()"),lambda HW="ArduinoMega": self.chooseHW(HW)
-        )
+        self.ui.actionWaltech.triggered.connect(lambda HW="Waltech": self.chooseHW(HW))
+        self.ui.actionArduinoUno.triggered.connect(lambda HW="ArduinoUno": self.chooseHW(HW))
+        self.ui.actionArduinoNano.triggered.connect(lambda HW="ArduinoNano": self.chooseHW(HW))
+        self.ui.actionArduinoMega.triggered.connect(lambda HW="ArduinoMega": self.chooseHW(HW))
         hwActionGroup = QActionGroup(self.ui.menuDiagnostics)
         hwActionGroup.addAction(self.ui.actionWaltech)
         hwActionGroup.addAction(self.ui.actionArduinoUno)
@@ -214,7 +205,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
 
     def checkmarkHW(self):
             pass
-        #print "hardware clicked"
+        #print("hardware clicked")
     ##########hardware choosing
     def chooseHW(self,HW):
         oldHW = self.currentHW
@@ -281,7 +272,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
         for i in range(height):
             for j in range(width):
                 if self.grid[i][j].ioAssign != None and self.grid[i][j].ioAssign[:3] == 'in_':
-                    #print "input:  ", self.grid[i][j].ioAssign[3:]
+                    #print("input:  ", self.grid[i][j].ioAssign[3:])
                     if int(self.grid[i][j].ioAssign[3:]) > MaxIONum: MaxIONum = int(self.grid[i][j].ioAssign[3:])
         return MaxIONum
 
@@ -292,7 +283,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
         for i in range(height):
             for j in range(width):
                 if self.grid[i][j].ioAssign != None and self.grid[i][j].ioAssign[:4] == 'out_':
-                    #print "input:  ", self.grid[i][j].ioAssign[3:]
+                    #print("input:  ", self.grid[i][j].ioAssign[3:])
                     if int(self.grid[i][j].ioAssign[4:]) > MaxIONum: MaxIONum = int(self.grid[i][j].ioAssign[4:])
         return MaxIONum
     ##########hardware choosing^^^^^   
@@ -330,7 +321,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
     def printLadder(self):
         #printer = QPrinter(QPrinter.HighResolution)
         printer = QPrinter()
-        dialog = QtGui.QPrintDialog(printer, self)   
+        dialog = QtPrintSupport.QPrintDialog(printer, self)
 
         if dialog.exec_() != QDialog.Accepted:
             return
@@ -346,8 +337,8 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
     #def printLadder(self):   
         image = QtGui.QImage(400,400,QtGui.QImage.Format_ARGB32)#for png
         #image = QtGui.QImage(256,256,QtGui.QImage.Format_RGB32)
-        painter = QtGui.QPainter(image)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+        painter = QPainter(image)
+        painter.setRenderHint(QPainter.Antialiasing)
         self.scene.render(painter)
         painter.end()
         print("saving image")
@@ -393,13 +384,13 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                     uiList.setSortingEnabled(False)#stop sorting while adding row
                     uiList.setRowCount(uiList.rowCount()+1)
                     numRows= uiList.rowCount()
-                    try: uiList.setItem(numRows-1,0,QtGui.QTableWidgetItem(self.grid[i][j].variableName))
+                    try: uiList.setItem(numRows-1,0,QTableWidgetItem(self.grid[i][j].variableName))
                     except: pass
-                    try: uiList.setItem(numRows-1,1,QtGui.QTableWidgetItem(self.grid[i][j].ioAssign))
+                    try: uiList.setItem(numRows-1,1,QTableWidgetItem(self.grid[i][j].ioAssign))
                     except: pass
-                    try: uiList.setItem(numRows-1,2,QtGui.QTableWidgetItem(self.grid[i][j].MTorElement))
+                    try: uiList.setItem(numRows-1,2,QTableWidgetItem(self.grid[i][j].MTorElement))
                     except: pass
-                    try: uiList.setItem(numRows-1,3,QtGui.QTableWidgetItem(str(i)+","+str(j)))
+                    try: uiList.setItem(numRows-1,3,QTableWidgetItem(str(i)+","+str(j)))
                     except: pass
                     uiList.setSortingEnabled(True)
   
@@ -407,7 +398,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
     #track which tool is being used. maybe use names here?
     def anyButton(self,who): 
         self.currentTool = who  
-        #print who
+        #print(who)
    
     def parseGrid(self):
         #self.showInfo()
@@ -462,7 +453,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
         if self.projectName == None:
             format = "wlm"
             initialPath = os.getcwd() + "/untitled." + format;
-            filename = QtGui.QFileDialog.getSaveFileName(self, 'Save As',initialPath)
+            filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save As',initialPath)
             self.projectName = filename
         else: 
             filename = self.projectName 
@@ -480,7 +471,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
             initialPath = os.getcwd() + "/untitled." + format;
         else:
             initialPath = self.currentFileDir + "untitled." + format;
-        filename = QtGui.QFileDialog.getSaveFileName(self, 'Save As',initialPath)
+        filename = QtWidgets.QFileDialog.getSaveFileName(self, 'Save As',initialPath)
         import ntpath
         justName = ntpath.basename(str(filename))
         self.currentFileDir = filename[0:(len(filename) - len(justName))]
@@ -493,9 +484,9 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
         f.close()
 
     def openFile(self):
-        filedialog = QtGui.QFileDialog()
+        filedialog = QtWidgets.QFileDialog()
         #filedialog.setNameFilter('*.jpg')
-        filename = filedialog.getOpenFileName(self, 'Open File', os.path.expanduser("~"),"*.wlm")
+        filename = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', os.path.expanduser("~"),"*.wlm")
         f = open(filename, 'rb') 
         import ntpath
         justName = ntpath.basename(str(filename))
@@ -520,7 +511,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
 
 
     def whatsThis(self):
-        QtGui.QWhatsThis.enterWhatsThisMode()
+        QWhatsThis.enterWhatsThisMode()
 
     def eventFilter(self, source, event):
         if event.type() == QtCore.QEvent.MouseMove:
@@ -543,7 +534,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
         else:
             pass # do other stuff
 
-        return QtGui.QMainWindow.eventFilter(self, source, event)
+        return super().eventFilter(source, event)
         #self.ui.graphicsView.viewport().installEventFilter(self)
 
     def findCell(self,event):
@@ -607,7 +598,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
             #self.ui.graphicsView.viewport().setCursor(QtCore.Qt.BlankCursor )
             #show cell numbers:   
             if self.currentTool != "addRung":
-                self.items[0] = QtGui.QGraphicsTextItem("%d, %d" %(i,j))
+                self.items[0] = QGraphicsTextItem("%d, %d" %(i,j))
                 self.items[0].setPos(self.grid[i][j].midPointX+35,self.grid[i][j].midPointY-35)
                 self.scene.addItem(self.items[0])
 
@@ -623,13 +614,13 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                 #y=self.grid[i][j].midPointY-90
                 w=200
                 h=1
-                self.items[1] = QtGui.QGraphicsRectItem(x-100,y,w,h)
-                self.items[1].setPen(QtGui.QColor("blue"))
+                self.items[1] = QGraphicsRectItem(x-100,y,w,h)
+                self.items[1].setPen(QColor("blue"))
                 self.scene.addItem(self.items[1])
-                self.items[0] = QtGui.QGraphicsTextItem("<                               >")
+                self.items[0] = QGraphicsTextItem("<                               >")
                 self.items[0].setPos(self.grid[i][j].midPointX-111,y-15)
-                self.items[0].setFont(QtGui.QFont("Arial",16))
-                self.items[0].setDefaultTextColor(QtGui.QColor("blue")) 
+                self.items[0].setFont(QFont("Arial",16))
+                self.items[0].setDefaultTextColor(QColor("blue"))
                 self.scene.addItem(self.items[0])
 
             elif self.currentTool == "Widen":  
@@ -637,8 +628,8 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                 y=self.grid[i][j].midPointY-90
                 w=1
                 h=62
-                self.items[1] = QtGui.QGraphicsRectItem(x,y,w,h)
-                self.items[1].setPen(QtGui.QColor("blue"))
+                self.items[1] = QGraphicsRectItem(x,y,w,h)
+                self.items[1].setPen(QColor("blue"))
                 self.scene.addItem(self.items[1])
             elif self.currentTool == "ORwire": 
                 if cellNum[2] =="up":
@@ -649,12 +640,12 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                 #y=self.grid[i][j].midPointY-60
                 w=1
                 h=60
-                self.items[1] = QtGui.QGraphicsRectItem(x,y,w,h)
-                self.items[1].setPen(QtGui.QColor("blue"))
+                self.items[1] = QGraphicsRectItem(x,y,w,h)
+                self.items[1].setPen(QColor("blue"))
                 self.scene.addItem(self.items[1])
             elif self.currentTool == "blankOR":  #"blankOR" 5
-                pixmap = QtGui.QPixmap(_fromUtf8(":/icons/icons/OR_big.png"))
-                self.items[1] = QtGui.QGraphicsPixmapItem(pixmap)
+                pixmap = QPixmap(":/icons/icons/OR_big.png")
+                self.items[1] = QGraphicsPixmapItem(pixmap)
                 x=self.grid[i][j].midPointX
                 y=self.grid[i][j].midPointY-60
                 self.items[1].setPos(x,y)
@@ -665,8 +656,8 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                 y=self.grid[i][j].midPointY-90
                 w=58
                 h=58
-                self.items[1] = QtGui.QGraphicsRectItem(x,y,w,h)
-                self.items[1].setPen(QtGui.QColor("blue"))
+                self.items[1] = QGraphicsRectItem(x,y,w,h)
+                self.items[1].setPen(QColor("blue"))
                 self.scene.addItem(self.items[1])
 
     def rightClick(self, cellNum):
@@ -694,7 +685,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                         self.grid[cellNum[0]][cellNum[1]].variableName = "rename_this"
                     else:
                         self.grid[cellNum[0]][cellNum[1]].variableName = tempCellData.variableName
-                        print "varname:", tempCellData.variableName
+                        print("varname:", tempCellData.variableName)
                     """    
                     self.grid[cellNum[0]][cellNum[1]].variableName = tempCellData.variableName
                     print("varname:", tempCellData.variableName)    
@@ -791,7 +782,7 @@ class mainWindowUI(QMainWindow): #mainwindow inheriting from QMainWindow here.
                 #>>element only allowed on rt (coil, timerreset..)
                 elif self.Tools.toolList[toolToPlace[1]].position == "right":
                     cellNum[1] = len(self.grid[0])-1 #right most spot
-                    print ("elemnt to right")
+                    print("elemnt to right")
                     if self.grid[cellNum[0]][cellNum[1]].MTorElement == "blankOR":
                         tempCellInfo = self.runPopup(toolToPlace[0],cellNum)# cause popup dialog
                         if tempCellInfo != False:
@@ -948,7 +939,7 @@ class elementStruct():
         self. toolType = toolType 
         #example:
         #toolName= "contNO"
-        #pixmap= QtGui.QPixmap(_fromUtf8(":/icons/icons/contact_NO_big.png"))
+        #pixmap= QPixmap(":/icons/icons/contact_NO_big.png")
         #position= "Any" or "Right"
         #toolType = "Rung" or "Element" or "blankOR"
 
@@ -957,27 +948,27 @@ class elementList():#list of tools.  uses elementStruct
         self.toolList = [elementStruct(0,0,0,0)]
         ##001##
         #list elements here:
-        self.toolList.append(elementStruct("contNO",QtGui.QPixmap(_fromUtf8(":/icons/icons/contact_NO.svg")),"any","Element"))
-        self.toolList.append(elementStruct("contNC",QtGui.QPixmap(_fromUtf8(":/icons/icons/contact_NC.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Coil",QtGui.QPixmap(_fromUtf8(":/icons/icons/Coil.svg")),"right","Element"))
-        self.toolList.append(elementStruct("CoilNot",QtGui.QPixmap(_fromUtf8(":/icons/icons/Coil_not.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Rising",QtGui.QPixmap(_fromUtf8(":/icons/icons/rising.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Fall",QtGui.QPixmap(_fromUtf8(":/icons/icons/falling.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Timer",QtGui.QPixmap(_fromUtf8(":/icons/icons/timer.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Counter",QtGui.QPixmap(_fromUtf8(":/icons/icons/counter.svg")),"any","Element"))
+        self.toolList.append(elementStruct("contNO",QPixmap(":/icons/icons/contact_NO.svg"),"any","Element"))
+        self.toolList.append(elementStruct("contNC",QPixmap(":/icons/icons/contact_NC.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Coil",QPixmap(":/icons/icons/Coil.svg"),"right","Element"))
+        self.toolList.append(elementStruct("CoilNot",QPixmap(":/icons/icons/Coil_not.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Rising",QPixmap(":/icons/icons/rising.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Fall",QPixmap(":/icons/icons/falling.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Timer",QPixmap(":/icons/icons/timer.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Counter",QPixmap(":/icons/icons/counter.svg"),"any","Element"))
 
-        self.toolList.append(elementStruct("Equals",QtGui.QPixmap(_fromUtf8(":/icons/icons/equ.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Plus",QtGui.QPixmap(_fromUtf8(":/icons/icons/plus.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Minus",QtGui.QPixmap(_fromUtf8(":/icons/icons/minus.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Move",QtGui.QPixmap(_fromUtf8(":/icons/icons/move.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Mult",QtGui.QPixmap(_fromUtf8(":/icons/icons/times.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Greater",QtGui.QPixmap(_fromUtf8(":/icons/icons/greater_than.svg")),"any","Element"))
-        self.toolList.append(elementStruct("Lessthan",QtGui.QPixmap(_fromUtf8(":/icons/icons/less_than.svg")),"any","Element"))
-        self.toolList.append(elementStruct("GreaterOrEq",QtGui.QPixmap(_fromUtf8(":/icons/icons/greater_than_or_eq.svg")),"any","Element"))
-        self.toolList.append(elementStruct("LessOrEq",QtGui.QPixmap(_fromUtf8(":/icons/icons/less_than_or_eq.svg")),"any","Element"))
-        self.toolList.append(elementStruct("PWM",QtGui.QPixmap(_fromUtf8(":/icons/icons/PWM.svg")),"right","Element"))
-        self.toolList.append(elementStruct("ADC",QtGui.QPixmap(_fromUtf8(":/icons/icons/ADC.svg")),"right","Element"))
-        self.toolList.append(elementStruct("Divide",QtGui.QPixmap(_fromUtf8(":/icons/icons/divide.svg")),"right","Element"))
+        self.toolList.append(elementStruct("Equals",QPixmap(":/icons/icons/equ.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Plus",QPixmap(":/icons/icons/plus.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Minus",QPixmap(":/icons/icons/minus.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Move",QPixmap(":/icons/icons/move.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Mult",QPixmap(":/icons/icons/times.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Greater",QPixmap(":/icons/icons/greater_than.svg"),"any","Element"))
+        self.toolList.append(elementStruct("Lessthan",QPixmap(":/icons/icons/less_than.svg"),"any","Element"))
+        self.toolList.append(elementStruct("GreaterOrEq",QPixmap(":/icons/icons/greater_than_or_eq.svg"),"any","Element"))
+        self.toolList.append(elementStruct("LessOrEq",QPixmap(":/icons/icons/less_than_or_eq.svg"),"any","Element"))
+        self.toolList.append(elementStruct("PWM",QPixmap(":/icons/icons/PWM.svg"),"right","Element"))
+        self.toolList.append(elementStruct("ADC",QPixmap(":/icons/icons/ADC.svg"),"right","Element"))
+        self.toolList.append(elementStruct("Divide",QPixmap(":/icons/icons/divide.svg"),"right","Element"))
         #Equals Plus Minus Move Mult Greater Lessthan GreaterOrEq LessOrEq PWM ADC Divide
 
         self.toolList.append(elementStruct("addRung",None,None,"Rung"))

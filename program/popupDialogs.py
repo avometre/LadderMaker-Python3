@@ -10,7 +10,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QLineEdit, QComboBox, QDialogButtonBox, QLabel, QDoubleSpinBox, QSpinBox, QTextBrowser
 import re
 ##006##
 #all the element dialogs
@@ -31,9 +31,9 @@ from wrongVersion_ui import Ui_wrongVersionDialog
 
 
 ##007##
-class CoilDialog(QtGui.QDialog):
+class CoilDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_CoilDialog()
         self.ui.setupUi(self)
@@ -53,9 +53,9 @@ class CoilDialog(QtGui.QDialog):
             
 
        
-class ContDialog(QtGui.QDialog):
-    def __init__(self, grid, cellNum, currentHW):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+class ContDialog(QtWidgets.QDialog):
+    def __init__(self, grid, cellNum, currentHW, parent=None):
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_ContDialog()
         self.ui.setupUi(self)
@@ -73,9 +73,9 @@ class ContDialog(QtGui.QDialog):
         cellSearch(grid,cellNum,self.currentHW).makeIOlist(self.ui.comboBox,True)
         cellSearch(grid,cellNum,self.currentHW).fillComment(self.ui.lineEdit)
            
-class EdgeDialog(QtGui.QDialog):
+class EdgeDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_EdgeDialog()
         self.ui.setupUi(self)
@@ -88,9 +88,9 @@ class EdgeDialog(QtGui.QDialog):
         #preload comboboxes:
         cellSearch(grid,cellNum,self.currentHW).fillComment(self.ui.lineEdit)
         
-class TimerDialog(QtGui.QDialog):
+class TimerDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_TimerDialog()
         self.ui.setupUi(self)
@@ -108,9 +108,9 @@ class TimerDialog(QtGui.QDialog):
         cellSearch(grid,cellNum,self.currentHW).fillComment(self.ui.lineEdit)
         cellSearch(grid,cellNum,self.currentHW).fillSpinBox(self.ui.doubleSpinBox)
         
-class CounterDialog(QtGui.QDialog):
+class CounterDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_CounterDialog()
         self.ui.setupUi(self)
@@ -128,9 +128,9 @@ class CounterDialog(QtGui.QDialog):
         cellSearch(grid,cellNum,self.currentHW).fillSpinBox(self.ui.spinBox)
         
 
-class CompairDialog(QtGui.QDialog):
+class CompairDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, tool, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_CompairDialog()
         self.ui.setupUi(self)
@@ -163,9 +163,9 @@ class CompairDialog(QtGui.QDialog):
         if self.grid[self.cellNum[0]][self.cellNum[1]].const_B != None:
             self.ui.spinBox_B.setValue(self.grid[self.cellNum[0]][self.cellNum[1]].const_B)   
 
-class MathDialog(QtGui.QDialog):
+class MathDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW,tool, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_MathDialog()
         self.ui.setupUi(self)
@@ -192,9 +192,9 @@ class MathDialog(QtGui.QDialog):
             self.ui.spinBox_B.setValue(self.grid[self.cellNum[0]][self.cellNum[1]].const_B)   
         
 ##needs to be used instead of combine with math:
-class MoveDialog(QtGui.QDialog):
+class MoveDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_MoveDialog()
         self.ui.setupUi(self)
@@ -212,9 +212,9 @@ class MoveDialog(QtGui.QDialog):
         cellSearch(grid,cellNum,self.currentHW).makeNamelistComp(self.ui.comboBox_A)
         cellSearch(grid,cellNum,self.currentHW).makeNamelistComp(self.ui.comboBox_B)
 
-class PWMDialog(QtGui.QDialog):
+class PWMDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_PWMDialog()
         self.ui.setupUi(self)
@@ -232,9 +232,9 @@ class PWMDialog(QtGui.QDialog):
         if self.grid[self.cellNum[0]][self.cellNum[1]].setPoint != None:
             self.ui.doubleSpinBox.setValue(self.grid[self.cellNum[0]][self.cellNum[1]].setPoint)
 
-class ADCDialog(QtGui.QDialog):
+class ADCDialog(QtWidgets.QDialog):
     def __init__(self, grid, cellNum, currentHW, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_ADCDialog()
         self.ui.setupUi(self)
@@ -250,9 +250,9 @@ class ADCDialog(QtGui.QDialog):
         cellSearch(grid,cellNum,self.currentHW).makeNamelistCont(self.ui.comboBox_2)
         cellSearch(grid,cellNum,self.currentHW).makeIOlist(self.ui.comboBox,"ADC")
 
-class ArduinoUnoIOHelpDialog(QtGui.QDialog):
+class ArduinoUnoIOHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_IODialog()
         self.ui.setupUi(self)
@@ -261,9 +261,9 @@ class ArduinoUnoIOHelpDialog(QtGui.QDialog):
             helpHtml=myfile.read()
         self.ui.textBrowser.setHtml(helpHtml)
         
-class ArduinoNanoIOHelpDialog(QtGui.QDialog):
+class ArduinoNanoIOHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_IODialog()
         self.ui.setupUi(self)
@@ -271,9 +271,9 @@ class ArduinoNanoIOHelpDialog(QtGui.QDialog):
             helpHtml=myfile.read()
         self.ui.textBrowser.setHtml(helpHtml)
         
-class ArduinoMegaIOHelpDialog(QtGui.QDialog):
+class ArduinoMegaIOHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_IODialog()
         self.ui.setupUi(self)
@@ -283,9 +283,9 @@ class ArduinoMegaIOHelpDialog(QtGui.QDialog):
         self.ui.textBrowser.setHtml(helpHtml)
         
 
-class AboutHelpDialog(QtGui.QDialog):
+class AboutHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_IODialog()
         self.ui.setupUi(self)
@@ -295,9 +295,9 @@ class AboutHelpDialog(QtGui.QDialog):
         self.ui.textBrowser.setHtml(helpHtml)
         
 
-class ThreeParallelsDialog(QtGui.QDialog):
+class ThreeParallelsDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         self.ui = Ui_IODialog()
         self.ui.setupUi(self)
@@ -306,9 +306,9 @@ class ThreeParallelsDialog(QtGui.QDialog):
         self.ui.textBrowser.setHtml(helpHtml)
 
         
-class USBHelpDialog(QtGui.QDialog):
+class USBHelpDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
         
          
@@ -318,17 +318,17 @@ class USBHelpDialog(QtGui.QDialog):
             helpHtml=myfile.read()
         self.ui.textBrowser.setHtml(helpHtml)
         
-class ardIODialog(QtGui.QDialog):
+class ardIODialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
             
         self.ui = Ui_ardIOnoteDialog()
         self.ui.setupUi(self)
      
-class wrongVersionDialog(QtGui.QDialog):
+class wrongVersionDialog(QtWidgets.QDialog):
     def __init__(self, parent=None):
-        QDialog.__init__(self)# Constructs a dialog with parent parent. self being ImageDailog
+        super().__init__(parent)
         # Set up the UI from Designer:
             
         self.ui = Ui_wrongVersionDialog()
@@ -381,7 +381,7 @@ class cellSearch(): #Functions for pre-filling the boxes in the Popup dialogs
         if thisThing == "const_A": thingVar = self.grid[self.cellNum[0]][self.cellNum[1]].const_A
         if thisThing == "source_B": thingVar = self.grid[self.cellNum[0]][self.cellNum[1]].source_B
         if thisThing == "const_B": thingVar = self.grid[self.cellNum[0]][self.cellNum[1]].const_B
-        print("$$$ thingVar: ",thingVar)
+        print("$$$ thingVar: ", thingVar)
         #scan the grid for names != None, put in comboBox
         shareNameList = []
         allNameList = []
